@@ -44,19 +44,54 @@ def fill_nan_based_on_datatype(column):
         return column
 
 df = df.apply(fill_nan_based_on_datatype)
+#--------------Question 1----------------------------------#
+print("#------------------------Question 1. Percentage of TV show and Movie-------------------------------#")
+# Count the occurrences of TV Shows and Movies
+type_counts = df['type'].value_counts()
 
-df_movie = df.groupby('type').get_group('Movie')
+# Calculate percentages
+total_count = type_counts.sum()
+tv_show_percentage = (type_counts['TV Show'] / total_count) * 100
+movie_percentage = (type_counts['Movie'] / total_count) * 100
+
+print(f"Percentage of TV Shows: {tv_show_percentage:.2f}%")
+print(f"Percentage of Movies: {movie_percentage:.2f}%")
+
+#--------------Question 2----------------------------------#
+print("#------------------------Question 2. Countries vs titles-------------------------------#")
+# Splitting titles associated with multiple countries and creating new rows
+split_data = []
+for index, row in df.iterrows():
+    countries = row['country'].split(', ')
+    for country in countries:
+        split_data.append({'title': row['title'], 'country': country})
+
+# Creating a new DataFrame with unique title-country pairs
+new_df = pd.DataFrame(split_data)
+
+# Grouping by 'Country' and aggregating titles, also calculating the count of titles
+grouped_df = new_df[new_df['country'] != 'Not available'].groupby('country')['title'].agg(['count', list]).reset_index()
+grouped_df.columns = ['Country', 'Number of Titles', 'Titles']
+
+print(grouped_df)
+#--------------Question 3----------------------------------#
+print("#------------------------Question 3. Top 10 Director-------------------------------#")
+# Counting titles per director after excluding missing values
+top_directors = df[df['director'] != 'Not available']['director'].value_counts().head(10)
+print(top_directors)
+
+
+#--------------Question 4----------------------------------#
+#----Start of TV show Data preprocessing----#
+
+
 df_tvshow = df.groupby('type').get_group('TV Show')
 
 df_tvshow.rename(columns={'duration': 'No. of seasons'}, inplace=True)
-df_movie.rename(columns={'duration': 'duration (in min)'}, inplace=True)
 
 df_tvshow.reset_index(drop=True, inplace=True)
-df_movie.reset_index(drop=True, inplace=True)
 
 df_tvshow.index = df_tvshow.index + 1
-df_movie.index = df_movie.index + 1
-#----Start of TV show Data preprocessing----#
 
 #adding column year_added
 df_tvshow['date_added'] = df_tvshow[df_tvshow['date_added'] != 'Not available']['date_added'].str.replace(' D', 'D')
@@ -79,6 +114,10 @@ df_tvshow['year_added'] = df_tvshow['date_added'].dt.year
 #----End of TV show Data preprocessing----#
 
 #----Start of Movie Data preprocessing----#
+df_movie = df.groupby('type').get_group('Movie')
+df_movie.rename(columns={'duration': 'duration (in min)'}, inplace=True)
+df_movie.reset_index(drop=True, inplace=True)
+df_movie.index = df_movie.index + 1
 
 #adding column year_added
 df_movie['date_added'] = df_movie[df_movie['date_added'] != 'Not available']['date_added'].str.replace(' D', 'D')
@@ -101,12 +140,13 @@ df_movie['year_added'] = df_movie['date_added'].dt.year
 #----End of Movie Data preprocessing----#
 
 #----*********End of Data preprocessing*********----#
+print("#------------------------Question 4: Own Insights-------------------------------#")
 
 #----------------Analysis of TV shows--------#
 print("#------------------------Analysis of TV shows-------------------------------#")
 #Basic Information
 print(f"Dataset Info:{df_tvshow.info()}")
-df_tvshow.describe()
+print(df_tvshow.describe())
 
 #Total no of TV shows
 num_shows = len(df_tvshow)
@@ -222,7 +262,7 @@ print("#------------------------Analysis of Movies------------------------------
 
 #Basic Information
 print(f"Dataset Info:{df_movie.info()}")
-df_movie.describe()
+print(df_movie.describe())
 
 #Total no of  movies
 num_movies = len(df_movie)
