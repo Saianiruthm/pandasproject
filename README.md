@@ -1,5 +1,13 @@
 # PANDAS Project
 
+## Medium Documentation
+
+For a detailed overview, analysis insights, and conclusions, please refer to our Medium document [here](https://medium.com/@sai2804aniruth/pandas-project-analysing-netflix-titles-5c81edc3e1cb).
+
+## Overview
+
+This document provides additional context, analysis, and final thoughts on the project.
+
 This repository contains a Python script (`index.py`) for data preprocessing and analysis, along with a dataset file (`data.csv`) sourced from `netflixtitles.csv`.
 
 ## Dataset Description
